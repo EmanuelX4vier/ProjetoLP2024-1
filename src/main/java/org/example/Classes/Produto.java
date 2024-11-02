@@ -2,7 +2,7 @@ package org.example.Classes;
 
 import java.util.Objects;
 
-public class Produto {
+public class Produto implements Comparable<Produto> {
     private String nome;
     private String tipo;
     private double valor;
@@ -66,11 +66,17 @@ public class Produto {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Produto produto = (Produto) o;
-        return Double.compare(valor, produto.valor) == 0 && codigo == produto.codigo && quantidade == produto.quantidade && Objects.equals(nome, produto.nome) && Objects.equals(tipo, produto.tipo);
+        return Double.compare(valor, produto.valor) == 0 && quantidade == produto.quantidade && Objects.equals(nome, produto.nome) && Objects.equals(tipo, produto.tipo) && Objects.equals(codigo, produto.codigo);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(nome, tipo, valor, codigo, quantidade);
+    }
+
+
+    @Override
+    public int compareTo(Produto o) {
+        return 0;
     }
 }

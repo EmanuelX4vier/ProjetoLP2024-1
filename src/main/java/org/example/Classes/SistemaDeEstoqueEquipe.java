@@ -2,14 +2,13 @@ package org.example.Classes;
 
 import org.example.Exceptions.*;
 
-import javax.swing.*;
-import java.io.*;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class SistemaDeEstoqueEquipe implements SistemaDeEstoque {
 
-    private List<Produto> estoque = new ArrayList<>();
+    private List<Produto> estoque;
     private GravadorDeDados gravadorDeProdutos;
 
     public SistemaDeEstoqueEquipe() {
@@ -17,260 +16,269 @@ public class SistemaDeEstoqueEquipe implements SistemaDeEstoque {
         this.gravadorDeProdutos = new GravadorDeDados();
     }
 
-    //Parte que trata do cadastro.
-    public boolean verificarSeEstaCadastrado(String nome) {
-        for (Produto p : this.estoque) {
+    // ==============================
+    // Métodos auxiliares
+    // ==============================
+    private Produto buscarProduto(String nome) {
+        for (Produto p : estoque) {
             if (p.getNome().equalsIgnoreCase(nome)) {
+                return p;
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public boolean verificarSeEstaCadastrado(String nome) {
+        return buscarProduto(nome) != null;
+    }
+
+    @Override
+    public boolean verificarSeTipoExiste(String tipo) {
+        for (Produto p : estoque) {
+            if (p.getTipo().equalsIgnoreCase(tipo)) {
                 return true;
             }
         }
         return false;
     }
 
-    public void cadastrarProduto(String nome, String tipo, double valor, String codigo, int quantidade) throws ProdutoJaCadastradoException{
+    // ==============================
+    // Cadastro
+    // ==============================
+    @Override
+    public void cadastrarProduto(String nome, String tipo, double valor, String codigo, int quantidade)
+            throws ProdutoJaCadastradoException {
         if (verificarSeEstaCadastrado(nome)) {
             throw new ProdutoJaCadastradoException("Este produto já foi cadastrado no estoque.");
         }
         Produto produto = new Produto(nome, tipo, valor, codigo, quantidade);
-        this.estoque.add(produto);
+        estoque.add(produto);
     }
 
-    public void cadastrarProduto(Produto produto) throws ProdutoJaCadastradoException{
+    @Override
+    public void cadastrarProduto(Produto produto) throws ProdutoJaCadastradoException {
         if (verificarSeEstaCadastrado(produto.getNome())) {
             throw new ProdutoJaCadastradoException("Este produto já foi cadastrado no estoque.");
         }
-        this.estoque.add(produto);
+        estoque.add(produto);
     }
 
-    //Parte com que trata dos nomes.
+    // ==============================
+    // Nome
+    // ==============================
+    @Override
     public String procurarProdutoPorNome(String nome) throws ProdutoNaoCadastradoException {
-        for (Produto p : this.estoque) {
-            if (p.getNome().equalsIgnoreCase(nome)) {
-                return p.toString();
-            }
+        Produto p = buscarProduto(nome);
+        if (p != null) {
+            return p.toString();
         }
         throw new ProdutoNaoCadastradoException("Este produto ainda não foi cadastrado:\n" + nome);
     }
 
-    public void alterarNomeDoProduto(String nome, String novoNome) throws ProdutoJaCadastradoException, ProdutoNaoCadastradoException {
+    @Override
+    public void alterarNomeDoProduto(String nome, String novoNome)
+            throws ProdutoJaCadastradoException, ProdutoNaoCadastradoException {
         if (verificarSeEstaCadastrado(novoNome)) {
-            throw new ProdutoJaCadastradoException("Já existe um produto com este nome no estoque:\n" + nome);
+            throw new ProdutoJaCadastradoException("Já existe um produto com este nome no estoque:\n" + novoNome);
         }
-        if (verificarSeEstaCadastrado(nome)) {
-            for (Produto p : this.estoque) {
-                if (p.getNome().equalsIgnoreCase(nome)) {
-                    p.setNome(novoNome);
-                }
-            }
+        Produto p = buscarProduto(nome);
+        if (p != null) {
+            p.setNome(novoNome);
         } else {
             throw new ProdutoNaoCadastradoException("Este produto ainda não foi cadastrado:\n" + nome);
         }
     }
 
-    //Parte que trata dos tipo.
-    public boolean verificaSeTipoExiste(String tipo) {
-        for (Produto p : this.estoque) {
-            if (p.getTipo().equalsIgnoreCase(tipo)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
+    // ==============================
+    // Tipo
+    // ==============================
+    @Override
     public List<Produto> procurarProdutoPorTipo(String tipo) throws TipoNaoExisteException {
         List<Produto> produtos = new ArrayList<>();
-        for (Produto p : this.estoque) {
+        for (Produto p : estoque) {
             if (p.getTipo().equalsIgnoreCase(tipo)) {
                 produtos.add(p);
             }
         }
-        if (produtos.size() != 0) {
+        if (!produtos.isEmpty()) {
             return produtos;
         }
-        throw new TipoNaoExisteException("Este tipo não existe no estoque:\n " + tipo);
+        throw new TipoNaoExisteException("Este tipo não existe no estoque:\n" + tipo);
     }
 
+    @Override
     public void alterarTipoDoProduto(String nome, String novoTipo) throws ProdutoNaoCadastradoException {
-        if (verificarSeEstaCadastrado(nome)) {
-            for (Produto p : this.estoque) {
-                if (p.getNome().equalsIgnoreCase(nome)) {
-                    p.setTipo(novoTipo);
-                }
-            }
+        Produto p = buscarProduto(nome);
+        if (p != null) {
+            p.setTipo(novoTipo);
         } else {
             throw new ProdutoNaoCadastradoException("Este produto ainda não foi cadastrado:\n" + nome);
         }
     }
 
-    //Parte que trata dos valores.
+    // ==============================
+    // Valor
+    // ==============================
+    @Override
     public void alterarValorDoProduto(String nome, double novoValor) throws ProdutoNaoCadastradoException {
-        if (verificarSeEstaCadastrado(nome)) {
-            for (Produto p : this.estoque) {
-                if (p.getNome().equalsIgnoreCase(nome)) {
-                    p.setValor(novoValor);
-                }
-            }
+        Produto p = buscarProduto(nome);
+        if (p != null) {
+            p.setValor(novoValor);
         } else {
             throw new ProdutoNaoCadastradoException("Este produto ainda não foi cadastrado:\n" + nome);
         }
     }
 
+    @Override
     public Produto produtoComMaiorValor() throws NaoExisteProdutoException {
-        if (estoque.isEmpty()) {
-            throw new NaoExisteProdutoException("Estoque vazio.");
-        }
-        Produto maiorValor = estoque.getFirst();
+        if (estoque.isEmpty()) throw new NaoExisteProdutoException("Estoque vazio.");
+
+        Produto maior = estoque.get(0);
         for (Produto p : estoque) {
-            if (p.getValor() > maiorValor.getValor()) {
-                maiorValor = p;
+            if (p.getValor() > maior.getValor()) {
+                maior = p;
             }
         }
-        if (maiorValor.getValor() != 0) {
-            return maiorValor;
-        }
-        throw new NaoExisteProdutoException("Estoque vazio.");
+        return maior;
     }
 
+    @Override
     public Produto produtoComMenorValor() throws NaoExisteProdutoException {
-        if (estoque.isEmpty()) {
-            throw new NaoExisteProdutoException("Estoque vazio.");
-        }
-        Produto menorValor = estoque.getFirst();
+        if (estoque.isEmpty()) throw new NaoExisteProdutoException("Estoque vazio.");
+
+        Produto menor = estoque.get(0);
         for (Produto p : estoque) {
-            if (p.getValor() < menorValor.getValor()) {
-                menorValor = p;
+            if (p.getValor() < menor.getValor()) {
+                menor = p;
             }
         }
-        if (menorValor.getValor() != 0) {
-            return menorValor;
-        }
-        throw new NaoExisteProdutoException("Estoque vazio.");
+        return menor;
     }
 
-    //Parte que trata dos códigos.
+    // ==============================
+    // Código
+    // ==============================
+    @Override
     public List<Produto> procurarProdutoPorCodigo(String codigo) throws CodigoNaoExisteException {
         List<Produto> produtos = new ArrayList<>();
-        for (Produto p : this.estoque) {
+        for (Produto p : estoque) {
             if (p.getCodigo().equals(codigo)) {
                 produtos.add(p);
             }
         }
-        if (produtos.size() > 0) {
+        if (!produtos.isEmpty()) {
             return produtos;
         }
         throw new CodigoNaoExisteException("Este código não existe.");
     }
 
+    @Override
     public void alterarCodigoDoProduto(String nome, String novoCodigo) throws ProdutoNaoCadastradoException {
-        if (verificarSeEstaCadastrado(nome)) {
-            for (Produto produto : estoque) {
-                if (produto.getNome().equalsIgnoreCase(nome)) {
-                    produto.setCodigo(novoCodigo);
-                }
-            }
+        Produto p = buscarProduto(nome);
+        if (p != null) {
+            p.setCodigo(novoCodigo);
         } else {
             throw new ProdutoNaoCadastradoException("Este produto ainda não foi cadastrado:\n" + nome);
         }
     }
 
-    //Parte que trata das quantidades.
-    public int quantidadeDoProduto(String nome, int novaQuantidade) throws ProdutoNaoCadastradoException {
-        for (Produto p : this.estoque) {
-            if (p.getNome().equalsIgnoreCase(nome)) {
-                return p.getQuantidade();
-            }
+    // ==============================
+    // Quantidade
+    // ==============================
+    @Override
+    public int quantidadeDoProduto(String nome) throws ProdutoNaoCadastradoException {
+        Produto p = buscarProduto(nome);
+        if (p != null) {
+            return p.getQuantidade();
         }
         throw new ProdutoNaoCadastradoException("Este produto ainda não foi cadastrado:\n" + nome);
     }
 
+    @Override
     public Produto produtoComMaiorQuantidade() throws NaoExisteProdutoException {
-        if (estoque.isEmpty()) {
-            throw new NaoExisteProdutoException("Estoque vazio.");
-        }
-        Produto maiorQuantidade = estoque.getFirst();
+        if (estoque.isEmpty()) throw new NaoExisteProdutoException("Estoque vazio.");
+
+        Produto maior = estoque.get(0);
         for (Produto p : estoque) {
-            if (p.getQuantidade() > maiorQuantidade.getQuantidade()) {
-                maiorQuantidade = p;
+            if (p.getQuantidade() > maior.getQuantidade()) {
+                maior = p;
             }
         }
-        if (maiorQuantidade.getQuantidade() != 0) {
-            return maiorQuantidade;
-        }
-        throw new NaoExisteProdutoException("Estoque vazio.");
+        return maior;
     }
 
+    @Override
     public Produto produtoComMenorQuantidade() throws NaoExisteProdutoException {
-        if (estoque.isEmpty()) {
-            throw new NaoExisteProdutoException("Estoque vazio.");
-        }
-        Produto menorQuantidade = estoque.getFirst();
+        if (estoque.isEmpty()) throw new NaoExisteProdutoException("Estoque vazio.");
+
+        Produto menor = estoque.get(0);
         for (Produto p : estoque) {
-            if (p.getQuantidade() < menorQuantidade.getQuantidade()) {
-                menorQuantidade = p;
+            if (p.getQuantidade() < menor.getQuantidade()) {
+                menor = p;
             }
         }
-        if (menorQuantidade.getQuantidade() != 0) {
-            return menorQuantidade;
-        }
-        throw new NaoExisteProdutoException("Estoque vazio.");
+        return menor;
     }
 
+    @Override
     public void alterarQuantidadeDoProduto(String nome, int novaQuantidade) throws ProdutoNaoCadastradoException {
-        if (verificarSeEstaCadastrado(nome)) {
-            for (Produto produto : estoque) {
-                if (produto.getNome().equalsIgnoreCase(nome)) {
-                    produto.setQuantidade(novaQuantidade);
-                }
-            }
+        Produto p = buscarProduto(nome);
+        if (p != null) {
+            p.setQuantidade(novaQuantidade);
         } else {
             throw new ProdutoNaoCadastradoException("Este produto ainda não foi cadastrado:\n" + nome);
         }
     }
 
+    @Override
     public void adicionarQuantidadeDoProduto(String nome, int valorInserido) throws ProdutoNaoCadastradoException {
-        if (verificarSeEstaCadastrado(nome)) {
-            for (Produto produto : estoque) {
-                if (produto.getNome().equalsIgnoreCase(nome)) {
-                    produto.setQuantidade(produto.getQuantidade() + valorInserido);
-                }
+        Produto p = buscarProduto(nome);
+        if (p != null) {
+            p.setQuantidade(p.getQuantidade() + valorInserido);
+        } else {
+            throw new ProdutoNaoCadastradoException("Este produto ainda não foi cadastrado:\n" + nome);
+        }
+    }
+
+    @Override
+    public void removerQuantidadeDoProduto(String nome, int valorRemovido) throws ProdutoNaoCadastradoException {
+        Produto p = buscarProduto(nome);
+        if (p != null) {
+            int novaQtd = p.getQuantidade() - valorRemovido;
+            if (novaQtd >= 0) {
+                p.setQuantidade(novaQtd);
             }
         } else {
             throw new ProdutoNaoCadastradoException("Este produto ainda não foi cadastrado:\n" + nome);
         }
     }
 
-    public void removerQuantidadeDoProduto(String nome, int valorInserido) throws ProdutoNaoCadastradoException {
-        if (verificarSeEstaCadastrado(nome)) {
-            for (Produto produto : estoque) {
-                if (produto.getNome().equalsIgnoreCase(nome)) {
-                    int novaQuantidade = produto.getQuantidade() - valorInserido;
-                    if (novaQuantidade >= 0) {
-                        produto.setQuantidade(novaQuantidade);
-                    }
-                }
-            }
-        } else {
-            throw new ProdutoNaoCadastradoException("Este produto ainda não foi cadastrado:\n" + nome);
-        }
-    }
-
-    //Relatório geral.
+    // ==============================
+    // Relatório
+    // ==============================
+    @Override
     public List<Produto> relatorioGeral() throws NaoExisteProdutoException {
-        if (estoque.size() != 0) {
-            return this.estoque;
+        if (estoque.isEmpty()) {
+            throw new NaoExisteProdutoException("Estoque Vazio.");
         }
-        throw new NaoExisteProdutoException("Estoque Vazio.");
+        return estoque;
     }
 
-    //Parte que trata salvamento, retorno e exclusão de dados.
-    public void salvarDados() throws IOException{
-        this.gravadorDeProdutos.gravaProdutos(this.estoque);
+    // ==============================
+    // Persistência
+    // ==============================
+    @Override
+    public void salvarDados() throws IOException {
+        gravadorDeProdutos.gravaProdutos(estoque);
     }
 
-    public void recuperaDados() throws IOException{
-        this.estoque = this.gravadorDeProdutos.recuperaDados();
+    @Override
+    public void recuperaDados() throws IOException {
+        estoque = gravadorDeProdutos.recuperaDados();
     }
 
+    @Override
     public void setEstoque(List<Produto> estoque) {
         this.estoque = estoque;
     }

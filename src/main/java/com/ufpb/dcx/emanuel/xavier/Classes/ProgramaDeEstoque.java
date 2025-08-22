@@ -1,19 +1,18 @@
-package org.example;
+package com.ufpb.dcx.emanuel.xavier.Classes;
 
-import org.example.Classes.*;
-import org.example.Exceptions.*;
+import com.ufpb.dcx.emanuel.xavier.Exceptions.*;
 
 import javax.swing.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ProgramaEstoqueDeProduto {
+public class ProgramaDeEstoque {
     public static void main(String[] args) {
         // =====================================
         // Inicializa o sistema de estoque
         // =====================================
-        SistemaDeEstoque sistema = new SistemaDeEstoqueEquipe();
+        InterfaceSistemaDeEstoque sistema = new SistemaDeEstoque();
 
         // =====================================
         // Tenta recuperar dados salvos anteriormente

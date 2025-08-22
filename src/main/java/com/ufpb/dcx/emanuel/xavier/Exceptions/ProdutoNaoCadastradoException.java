@@ -1,4 +1,4 @@
-package org.example.Exceptions;
+package com.ufpb.dcx.emanuel.xavier.Exceptions;
 
 public class ProdutoNaoCadastradoException extends Exception{
     public ProdutoNaoCadastradoException(String msg) {

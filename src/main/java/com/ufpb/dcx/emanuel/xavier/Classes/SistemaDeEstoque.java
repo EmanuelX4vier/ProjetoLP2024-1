@@ -1,17 +1,17 @@
-package org.example.Classes;
+package com.ufpb.dcx.emanuel.xavier.Classes;
 
-import org.example.Exceptions.*;
+import com.ufpb.dcx.emanuel.xavier.Exceptions.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SistemaDeEstoqueEquipe implements SistemaDeEstoque {
+public class SistemaDeEstoque implements InterfaceSistemaDeEstoque {
 
     private List<Produto> estoque;
     private GravadorDeDados gravadorDeProdutos;
 
-    public SistemaDeEstoqueEquipe() {
+    public SistemaDeEstoque() {
         this.estoque = new ArrayList<>();
         this.gravadorDeProdutos = new GravadorDeDados();
     }

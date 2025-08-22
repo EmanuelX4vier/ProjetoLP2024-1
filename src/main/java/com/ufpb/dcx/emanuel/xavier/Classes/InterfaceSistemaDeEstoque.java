@@ -1,11 +1,11 @@
-package org.example.Classes;
+package com.ufpb.dcx.emanuel.xavier.Classes;
 
-import org.example.Exceptions.*;
+import com.ufpb.dcx.emanuel.xavier.Exceptions.*;
 
 import java.io.IOException;
 import java.util.List;
 
-public interface SistemaDeEstoque {
+public interface InterfaceSistemaDeEstoque {
 
     // ==============================
     // Cadastro

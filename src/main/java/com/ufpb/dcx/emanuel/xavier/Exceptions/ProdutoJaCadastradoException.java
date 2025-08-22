@@ -1,4 +1,4 @@
-package org.example.Exceptions;
+package com.ufpb.dcx.emanuel.xavier.Exceptions;
 
 public class ProdutoJaCadastradoException extends Exception {
     public ProdutoJaCadastradoException (String msg) {

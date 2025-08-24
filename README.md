@@ -1,2 +1,1 @@
-# ProjetoLP2024-1
-Criação e aprimoramento do primeiro meu primeiro projeto no curso.
+Criação do meu projeto de LP 2024-1.
